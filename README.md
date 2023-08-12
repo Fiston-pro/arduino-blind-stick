@@ -17,7 +17,7 @@ Water sensor
 Light sensor
 
 You can check the below image too
-![Image of the connections](connections.png)
+![Image of the connections](./connections.jpg)
 
 License
 This project is licensed under the MIT License.
