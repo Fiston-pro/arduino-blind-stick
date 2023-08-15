@@ -46,22 +46,28 @@ void loop() {
   Serial.print(distance);
   Serial.println("cm");
 
-  if (distance <= distanceThreshold) {
-    Serial.println("Obstacle Detected!");
+  if (distance <= distanceThreshold - 25) {
+    Serial.println("US: Obstacle Detected!");
+    digitalWrite(buzzerPin, HIGH);
+    delay(200);
+  } if (distance <= distanceThreshold) {
+    Serial.println("US: Obstacle Detected!");
     digitalWrite(buzzerPin, HIGH);
     delay(500);
+    
   } else {
+    Serial.println("US: Obstacle not Detected!");
     digitalWrite(buzzerPin, LOW);
   }
 
   //IR sensor
   int irSensorValue = digitalRead(irSensorPin);
   if (irSensorValue == LOW) {
-    Serial.println("Obstacle Detected!");
+    Serial.println("IR: Obstacle Detected!");
     digitalWrite(buzzerPin, HIGH);
     delay(500);
   } else {
-    Serial.println("Obstacle not Detected!");
+    Serial.println("IR: Obstacle not Detected!");
     digitalWrite(buzzerPin, LOW);
   }
   
@@ -69,17 +75,19 @@ void loop() {
   int heartRate = analogRead(heartRateSensorPin) ;
   Serial.print("Heart Rate: ");
   Serial.println(heartRate);
+   // Check if heart rate is outside the normal range
+  if (heartRate < 60 || heartRate > 100) {
+    Serial.println("Abnormal Heart Rate Detected!");
+    digitalWrite(buzzerPin, HIGH);
+    delay(1000);  // Buzzer on for 1 seconds
+    digitalWrite(buzzerPin, LOW);
+  }
   
   //Temperature sensor
   int temperatureValue = analogRead(temperaturePin);
   float temperature = temperatureValue * 0.48828125;
   Serial.print("Temperature: ");
   Serial.print(temperature);
-  Serial.println("C");
-
-  float tempC = dht.readTemperature();
-  Serial.print("Temperature new: ");
-  Serial.print(tempC);
   Serial.println("C");
 
 //  if (temperature > temperatureThreshold) {
