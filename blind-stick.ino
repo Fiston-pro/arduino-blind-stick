@@ -1,4 +1,3 @@
-#include "DHT.h"
 #define DHTPIN 5
 #define DHTTYPE DHT11
 
@@ -12,8 +11,9 @@ const int buzzerPin = 9;       //speaker
 const int waterSensorPin = 8;        //water sensor
 
 const float temperatureThreshold = 30.0; // Adjust this value based on desired temperature threshold
-const int ldrThreshold = 500; // Adjust this value based on desired light threshold
-const int distanceThreshold = 50; // Adjust this value based on desired distance threshold
+const int ldrThreshold = 300; // Adjust this value based on desired light threshold
+const int distanceThreshold = 60; // Adjust this value based on desired distance threshold
+const int distanceThreshold1 = 30;  //Distance threshold when it is very close
 
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -22,11 +22,10 @@ void setup() {
   pinMode(echoPin, INPUT);
   pinMode(irSensorPin, INPUT);
   pinMode(heartRateSensorPin, INPUT);
-  pinMode(temperaturePin, INPUT);
+//  pinMode(temperaturePin, INPUT);
   pinMode(ldrPin, INPUT);
   pinMode(buzzerPin, OUTPUT);
   pinMode(waterSensorPin, INPUT);
-  dht.begin(); // initialize the temperature sensor
   
   Serial.begin(9600);
 }
@@ -46,17 +45,27 @@ void loop() {
   Serial.print(distance);
   Serial.println("cm");
 
-  if (distance <= distanceThreshold - 25) {
+  // Determine whether the buzzer should be on and delay based on distance
+  bool buzzerShouldBeOn = false;
+  int buzzDuration = 0;
+
+  if (distance <= distanceThreshold1) {
     Serial.println("US: Obstacle Detected!");
-    digitalWrite(buzzerPin, HIGH);
-    delay(200);
-  } if (distance <= distanceThreshold) {
+    buzzerShouldBeOn = true;
+    buzzDuration = 50;  // Shorter buzz duration
+  } else if (distance <= distanceThreshold) {
     Serial.println("US: Obstacle Detected!");
+    buzzerShouldBeOn = true;
+    buzzDuration = 500;  // Longer buzz duration
+  }
+
+  // Control the buzzer based on buzzerShouldBeOn and buzzDuration
+  if (buzzerShouldBeOn) {
     digitalWrite(buzzerPin, HIGH);
-    delay(500);
-    
+    delay(buzzDuration);
+    digitalWrite(buzzerPin, LOW);
+    delay(buzzDuration);  // Add delay for the pause between buzzes
   } else {
-    Serial.println("US: Obstacle not Detected!");
     digitalWrite(buzzerPin, LOW);
   }
 
@@ -77,28 +86,17 @@ void loop() {
   Serial.println(heartRate);
    // Check if heart rate is outside the normal range
   if (heartRate < 60 || heartRate > 100) {
-    Serial.println("Abnormal Heart Rate Detected!");
-    digitalWrite(buzzerPin, HIGH);
-    delay(1000);  // Buzzer on for 1 seconds
-    digitalWrite(buzzerPin, LOW);
-  }
-  
-  //Temperature sensor
-  int temperatureValue = analogRead(temperaturePin);
-  float temperature = temperatureValue * 0.48828125;
-  Serial.print("Temperature: ");
-  Serial.print(temperature);
-  Serial.println("C");
-
-//  if (temperature > temperatureThreshold) {
-//    Serial.println("High Temperature Detected!");
+    Serial.println("Heart rate sensor is detecting out of range of 60 and 100");
 //    digitalWrite(buzzerPin, HIGH);
-//    digitalWrite(vibratorPin, HIGH);
-//    delay(500);
-//  } else {
-//    digitalWrite(buzzerPin, LOW);
-//    digitalWrite(vibratorPin, LOW);
-//  }
+  }
+
+  //Temperature sensor
+//  int temperatureValue = analogRead(temperaturePin);
+//  float temperature = temperatureValue * 0.48828125;
+//  Serial.print("Temperature: ");
+//  Serial.print(temperature);
+//  Serial.println("C");
+  
   
   // LDR (Light Dependent Resistor)
   int ldrValue = analogRead(ldrPin);
@@ -126,5 +124,5 @@ void loop() {
       digitalWrite(buzzerPin, LOW);
   }
   
-  delay(1000);
+  delay(200);
 }
