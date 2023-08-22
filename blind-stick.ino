@@ -1,5 +1,3 @@
-#define DHTPIN 5
-#define DHTTYPE DHT11
 
 const int trigPin = 2;
 const int echoPin = 3;
@@ -15,7 +13,6 @@ const int ldrThreshold = 300; // Adjust this value based on desired light thresh
 const int distanceThreshold = 60; // Adjust this value based on desired distance threshold
 const int distanceThreshold1 = 30;  //Distance threshold when it is very close
 
-DHT dht(DHTPIN, DHTTYPE);
 
 void setup() {
   pinMode(trigPin, OUTPUT);
